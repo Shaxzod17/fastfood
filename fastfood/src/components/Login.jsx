@@ -1,10 +1,12 @@
 import React, {useState} from 'react';
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import "./Login.css"
 
 function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
 
 
     const submitLogin = async (e) => {
@@ -19,12 +21,17 @@ function Login() {
                 password: trimmedPassword,
             });
 
-            localStorage.setItem("accessToken", res.data.access_token);
-            localStorage.setItem("refreshToken", res.data.refresh_token);
-
+            const accessToken = res.data.access_token;
+            const refreshToken = res.data.refresh_token;
+            
+            localStorage.setItem("accessToken", accessToken);
+            localStorage.setItem("refreshToken", refreshToken);
+            
+            console.log("Login successful! Tokens stored.");
+            console.log("Access token (first 50 chars):", accessToken.substring(0, 50));
+            
             alert("Login successful!");
-            console.log(res.data);
-            // ... rest is the same
+            navigate("/");
         } catch (err) {
             console.log(err.response?.status, err.response?.data); // temporary debug
             alert("Invalid username or password");

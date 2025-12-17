@@ -19,12 +19,20 @@ public class Order {
     @ManyToOne
     private User user;
     private Float totalPrice;
+    private String location;
     @OneToMany
     private List<OrderProduct> orderProducts;
 
     public Order(User user, Float totalPrice, List<OrderProduct> orderProducts) {
         this.user = user;
         this.totalPrice = totalPrice;
+        this.orderProducts = orderProducts;
+    }
+
+    public Order(User user, Float totalPrice, String location, List<OrderProduct> orderProducts) {
+        this.user = user;
+        this.totalPrice = totalPrice;
+        this.location = location;
         this.orderProducts = orderProducts;
     }
 }

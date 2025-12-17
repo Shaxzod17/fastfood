@@ -26,12 +26,14 @@ public class MyFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             String authorization = request.getHeader("Authorization");
-            String id = jwtService.extractToken(authorization);
-           UserDetails  user = userRepo.findById(UUID.fromString(id)).orElseThrow();
-           SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities()));
+            if (authorization != null && !authorization.isEmpty()) {
+                String id = jwtService.extractToken(authorization);
+                UserDetails user = userRepo.findById(UUID.fromString(id)).orElseThrow();
+                SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities()));
+            }
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            System.out.println("MyFilter error: " + e.getMessage());
         }
-    filterChain.doFilter(request, response);
+        filterChain.doFilter(request, response);
     }
 }

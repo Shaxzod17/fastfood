@@ -8,7 +8,9 @@ public interface OrderProjection {
     UUID getOrderId();
     UUID getUserId();
     String getFirstName();
+    String getLastName();
     @JsonRawValue
     Object getOrders();
     Float getTotal();
+    String getLocation();
 }

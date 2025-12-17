@@ -1,8 +1,177 @@
+import React, { useEffect, useState } from 'react';
+import { FaShoppingCart, FaUser, FaDollarSign, FaMapMarkerAlt, FaSpinner } from 'react-icons/fa';
+import { getUserOrders } from '../api/orderApi';
+import './Admin.css';
+
 function Admin() {
-    return(
-        <div>
-            <h1>Salom</h1>
+    const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        loadOrders();
+    }, []);
+
+    const loadOrders = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const data = await getUserOrders();
+            setOrders(Array.isArray(data) ? data : []);
+        } catch (err) {
+            console.error("Failed to load orders:", err);
+            if (err.response?.status === 403) {
+                setError("Access denied. Admin privileges required. Visit /admin-setup to assign admin role.");
+            } else if (err.message?.includes("Session expired") || err.message?.includes("login")) {
+                setError("Session expired. Please login again.");
+                setTimeout(() => {
+                    window.location.href = "/login";
+                }, 2000);
+            } else {
+                setError(err.response?.data?.message || err.message || "Failed to load orders");
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const parseOrderItems = (ordersData) => {
+        try {
+            if (typeof ordersData === 'string') {
+                return JSON.parse(ordersData);
+            }
+            return ordersData;
+        } catch (e) {
+            return [];
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="admin-container">
+                <div className="admin-loading">
+                    <FaSpinner className="spinner" />
+                    <p>Loading orders...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="admin-container">
+                <div className="admin-error">
+                    <h2>Error</h2>
+                    <p>{error}</p>
+                    {error.includes("Access denied") && (
+                        <div style={{ marginTop: '20px' }}>
+                            <a href="/admin-setup" style={{ 
+                                color: '#ffd966', 
+                                textDecoration: 'underline',
+                                fontSize: '16px',
+                                display: 'block',
+                                marginBottom: '15px'
+                            }}>
+                                Click here to assign admin role
+                            </a>
+                        </div>
+                    )}
+                    <button onClick={loadOrders} className="retry-btn" style={{ marginTop: '10px' }}>Retry</button>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="admin-container">
+            <div className="admin-header">
+                <h1>
+                    <FaShoppingCart /> Admin Dashboard - Orders
+                </h1>
+                <button onClick={loadOrders} className="refresh-btn">
+                    Refresh
+                </button>
+            </div>
+
+            {orders.length === 0 ? (
+                <div className="admin-empty">
+                    <FaShoppingCart className="empty-icon" />
+                    <h2>No orders found</h2>
+                    <p>There are no orders to display at this time.</p>
+                </div>
+            ) : (
+                <div className="orders-list">
+                    {orders.map((order) => {
+                        const orderItems = parseOrderItems(order.orders);
+                        return (
+                            <div key={order.orderId} className="order-card">
+                                <div className="order-header">
+                                    <div className="order-id">
+                                        <strong>Order ID:</strong> {order.orderId?.substring(0, 8)}...
+                                    </div>
+                                    <div className="order-total">
+                                        <FaDollarSign /> ${order.total?.toFixed(2)}
+                                    </div>
+                                </div>
+
+                                <div className="order-customer">
+                                    <FaUser className="customer-icon" />
+                                    <div>
+                                        <strong>{order.firstName}</strong>
+                                        {order.lastName && ` ${order.lastName}`}
+                                        <div className="customer-id">User ID: {order.userId?.substring(0, 8)}...</div>
+                                    </div>
+                                </div>
+
+                                {orderItems && orderItems.length > 0 && (
+                                    <div className="order-items">
+                                        <h3>Items:</h3>
+                                        <ul>
+                                            {orderItems.map((item, index) => (
+                                                <li key={index} className="order-item">
+                                                    <span className="item-name">{item.name}</span>
+                                                    <span className="item-details">
+                                                        Qty: {item.amount} × ${item.price?.toFixed(2)} = 
+                                                        ${((item.amount || 0) * (item.price || 0)).toFixed(2)}
+                                                    </span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+
+                                {order.location && (
+                                    <div className="order-location">
+                                        <FaMapMarkerAlt className="location-icon" />
+                                        <span><strong>Delivery Location:</strong> {order.location}</span>
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+
+            <div className="admin-stats">
+                <div className="stat-card">
+                    <FaShoppingCart className="stat-icon" />
+                    <div>
+                        <h3>{orders.length}</h3>
+                        <p>Total Orders</p>
+                    </div>
+                </div>
+                <div className="stat-card">
+                    <FaDollarSign className="stat-icon" />
+                    <div>
+                        <h3>
+                            ${orders.reduce((sum, order) => sum + (order.total || 0), 0).toFixed(2)}
+                        </h3>
+                        <p>Total Revenue</p>
+                    </div>
+                </div>
+            </div>
         </div>
-    )
+    );
 }
-export default Admin
+
+export default Admin;

@@ -1,12 +1,11 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.OrderDto;
+import com.example.backend.dto.CreateOrderRequest;
 import org.springframework.http.HttpEntity;
 
-import java.util.List;
-
 public interface OrderService {
-HttpEntity<?> createOrder(List<OrderDto> dto, String token);
+HttpEntity<?> createOrder(CreateOrderRequest request, String token);
 HttpEntity<?> getUserOrders(String token);
+HttpEntity<?> getAllOrders();
 }
 

@@ -1,0 +1,19 @@
+.location-map-container {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.map-instruction {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    font-style: italic;
+}
+
+/* Ensure Leaflet map container has proper styling */
+.leaflet-container {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+

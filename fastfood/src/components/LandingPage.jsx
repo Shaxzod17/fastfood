@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getProducts, getProductImage } from "../api/productApi.js";
 import burger from "../img/28c866cd86d7bc0f9c0b4329226ce57a4cc97386.png";
 import coffee from "../img/coffee.png";
+import Cart from "./Cart.jsx";
 import "../App.css";
 
 function LandingPage() {
@@ -14,12 +15,52 @@ function LandingPage() {
     };
 
     const [products, setProducts] = useState([]);
+    const [cartItems, setCartItems] = useState([]);
+    const [isCartOpen, setIsCartOpen] = useState(false);
 
     useEffect(() => {
         getProducts()
             .then(setProducts)
             .catch(err => console.error("Failed to load menu", err));
     }, []);
+
+    const addToCart = (productId) => {
+        setCartItems(prevItems => {
+            const existingItem = prevItems.find(item => item.productId === productId);
+            if (existingItem) {
+                return prevItems.map(item =>
+                    item.productId === productId
+                        ? { ...item, quantity: item.quantity + 1 }
+                        : item
+                );
+            } else {
+                return [...prevItems, { productId, quantity: 1 }];
+            }
+        });
+        setIsCartOpen(true);
+    };
+
+    const updateQuantity = (productId, newQuantity) => {
+        if (newQuantity <= 0) {
+            removeFromCart(productId);
+            return;
+        }
+        setCartItems(prevItems =>
+            prevItems.map(item =>
+                item.productId === productId
+                    ? { ...item, quantity: newQuantity }
+                    : item
+            )
+        );
+    };
+
+    const removeFromCart = (productId) => {
+        setCartItems(prevItems => prevItems.filter(item => item.productId !== productId));
+    };
+
+    const getCartItemCount = () => {
+        return cartItems.reduce((total, item) => total + item.quantity, 0);
+    };
 
 
     return (
@@ -34,7 +75,16 @@ function LandingPage() {
                         <li onClick={() => scrollToSection("footer")}>Contact us</li>
                     </ul>
                     <div className="nav-icons">
-                        <FaShoppingCart />
+                        <div 
+                            className="cart-icon-wrapper" 
+                            onClick={() => setIsCartOpen(true)}
+                            style={{ position: 'relative', cursor: 'pointer' }}
+                        >
+                            <FaShoppingCart />
+                            {getCartItemCount() > 0 && (
+                                <span className="cart-badge">{getCartItemCount()}</span>
+                            )}
+                        </div>
                         <FaUserShield />
                     </div>
                 </div>
@@ -94,7 +144,7 @@ function LandingPage() {
                                 <h3>{product.name}</h3>
                                 <p className="menu-desc">{product.description}</p>
                                 <span className="menu-price">${product.price}</span>
-                                <button>Order Now</button>
+                                <button onClick={() => addToCart(product.id)}>Order Now</button>
                             </div>
                         ))}
                     </div>
@@ -215,6 +265,15 @@ function LandingPage() {
                 </div>
             </footer>
 
+            {isCartOpen && (
+                <Cart
+                    cartItems={cartItems}
+                    onUpdateQuantity={updateQuantity}
+                    onRemoveItem={removeFromCart}
+                    onClose={() => setIsCartOpen(false)}
+                    products={products}
+                />
+            )}
         </div>
     );
 }
