@@ -34,7 +34,7 @@ httpSecurity.csrf(AbstractHttpConfigurer::disable).cors(Customizer.withDefaults(
                 requestMatchers("/api/orders").permitAll().
                 requestMatchers(HttpMethod.GET, "/api/products/img").permitAll().
                 requestMatchers(HttpMethod.GET,"/api/auth/refresh").permitAll().
-                requestMatchers(HttpMethod.GET,"/api/auth/login").permitAll().
+                requestMatchers("/api/auth/**").permitAll().
                 requestMatchers(HttpMethod.POST,"/api/auth/register").permitAll().anyRequest().authenticated()).addFilterBefore(myFilter, UsernamePasswordAuthenticationFilter.class);
     return httpSecurity.build();
 }

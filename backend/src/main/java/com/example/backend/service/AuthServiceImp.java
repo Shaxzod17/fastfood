@@ -7,9 +7,8 @@ import com.example.backend.repository.RoleRepo;
 import com.example.backend.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,8 +25,6 @@ public class AuthServiceImp implements AuthService {
     @Autowired
     RoleRepo roleRepo;
     @Autowired
-    AuthenticationManager authenticationManager;
-    @Autowired
     JwtService jwtService;
 
     @Override
@@ -36,14 +33,19 @@ public class AuthServiceImp implements AuthService {
         System.out.println(roleUser);
         User save = userRepo.save(new User(dto.username(), passwordEncoder.encode(dto.password()),
                 dto.firstName(), dto.lastName(), roleUser, true));
-    return ResponseEntity.ok(save);
+        return ResponseEntity.ok(save);
     }
 
     @Override
-    public HttpEntity<?> getUser(String username, String password) {
+    public ResponseEntity<?> getUser(String username, String password) {
         System.out.println(username);
         User user = userRepo.findByUsername(username).orElseThrow();
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        // Manually verify password using the configured PasswordEncoder instead of AuthenticationManager
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            // Return 401 when password is wrong
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Bad credentials"));
+        }
         String accessToken = jwtService.generateJwtToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
         return ResponseEntity.ok(Map.of("access_token",accessToken,"refresh_token",refreshToken));

@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.LoginDto;
 import com.example.backend.dto.UserDto;
 import com.example.backend.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +15,11 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     @Autowired
     AuthService authService;
-    @GetMapping("/login")
-    public HttpEntity<?> checkUser(@RequestParam String username, @RequestParam String password) {
-        System.out.println(username);
-        System.out.println(password);
-        HttpEntity<?> user = authService.getUser(username, password);
-        System.out.println(user);
-         return authService.getUser(username,password);
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginDto dto) {
+        return authService.getUser(dto.username(), dto.password());
     }
+
     @PostMapping("/register")
     public HttpEntity<?> saveUser(@RequestBody UserDto dto){
     return   authService.saveUser(dto);

@@ -25,7 +25,7 @@ public class MyFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            String authorization = request.getHeader("authorization");
+            String authorization = request.getHeader("Authorization");
             String id = jwtService.extractToken(authorization);
            UserDetails  user = userRepo.findById(UUID.fromString(id)).orElseThrow();
            SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities()));
