@@ -24,7 +24,7 @@ function Cart({ cartItems, onUpdateQuantity, onRemoveItem, onClose, products }) 
         if (!token) {
             setError("Please login first to place an order");
             setTimeout(() => {
-                window.location.href = "/login";
+                window.location.href = "/register";
             }, 2000);
             return;
         }

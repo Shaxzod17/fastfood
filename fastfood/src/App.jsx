@@ -5,6 +5,7 @@ import Login from "./components/Login.jsx";
 import Cart from "./components/Cart.jsx";
 import AdminSetup from "./components/AdminSetup.jsx";
 import Register from "./components/Register.jsx";
+import Status from "./components/Status.jsx";
 
 function App() {
     return (
@@ -12,6 +13,7 @@ function App() {
             <BrowserRouter>
                     <Routes>
                         <Route path="/" element={<LandingPage />} />
+                        <Route path="/status" element={<Status />} />
                         <Route path="/admin" element={<Admin />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register/>}/>
