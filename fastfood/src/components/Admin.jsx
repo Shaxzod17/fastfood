@@ -21,7 +21,7 @@ function Admin() {
         } catch (err) {
             console.error("Failed to load orders:", err);
             if (err.response?.status === 403) {
-                setError("Access denied. Admin privileges required. Visit /admin-setup to assign admin role.");
+                setError("Access denied. Visit /login to assign admin role.");
             } else if (err.message?.includes("Session expired") || err.message?.includes("login")) {
                 setError("Session expired. Please login again.");
                 setTimeout(() => {
@@ -65,8 +65,8 @@ function Admin() {
                     <p>{error}</p>
                     {error.includes("Access denied") && (
                         <div style={{ marginTop: '20px' }}>
-                            <a href="/admin-setup" style={{ 
-                                color: '#ffd966', 
+                            <a href="/login" style={{
+                                color: '#ffd966',
                                 textDecoration: 'underline',
                                 fontSize: '16px',
                                 display: 'block',
@@ -86,7 +86,7 @@ function Admin() {
         <div className="admin-container">
             <div className="admin-header">
                 <h1>
-                    <FaShoppingCart />Orders
+                    <FaShoppingCart /> Orders
                 </h1>
                 <button onClick={loadOrders} className="refresh-btn">
                     Refresh
@@ -101,13 +101,15 @@ function Admin() {
                 </div>
             ) : (
                 <div className="orders-list">
-                    {orders.map((order) => {
+                    {orders.map((order, index) => {
                         const orderItems = parseOrderItems(order.orders);
+                        const orderNumber = orders.length - index;
+
                         return (
                             <div key={order.orderId} className="order-card">
                                 <div className="order-header">
                                     <div className="order-id">
-                                        <strong>Order ID:</strong> {order.orderId?.substring(0, 8)}...
+                                        <strong>Order #</strong> {orderNumber}
                                     </div>
                                     <div className="order-total">
                                         {order.total} so'm
@@ -119,7 +121,6 @@ function Admin() {
                                     <div>
                                         <strong>{order.firstName}</strong>
                                         {order.lastName && ` ${order.lastName}`}
-                                        <div className="customer-id">User ID: {order.userId?.substring(0, 8)}...</div>
                                     </div>
                                 </div>
 
@@ -127,12 +128,11 @@ function Admin() {
                                     <div className="order-items">
                                         <h3>Items:</h3>
                                         <ul>
-                                            {orderItems.map((item, index) => (
-                                                <li key={index} className="order-item">
+                                            {orderItems.map((item, idx) => (
+                                                <li key={idx} className="order-item">
                                                     <span className="item-name">{item.name}</span>
                                                     <span className="item-details">
-                                                        Quantity: {item.amount} × {item.price} =
-                                                        {((item.amount || 0) * (item.price || 0))}
+                                                        Quantity: {item.amount} × {item.price} so'm = {((item.amount || 0) * (item.price || 0))} so'm
                                                     </span>
                                                 </li>
                                             ))}
