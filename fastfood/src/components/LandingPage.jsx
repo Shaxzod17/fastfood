@@ -63,7 +63,7 @@ function LandingPage() {
     };
 
     const handleLoginClick = () => {
-        navigate("/login");
+        navigate("/register");
     };
 
     const addToCart = (productId) => {
@@ -123,7 +123,7 @@ function LandingPage() {
                             </div>
                         ) : (
                             <button onClick={handleLoginClick} className="login-button">
-                                Login
+                                Sign in
                             </button>
                         )}
                     </div>
