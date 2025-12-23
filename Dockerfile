@@ -17,7 +17,7 @@ RUN chmod +x ./mvnw
 RUN --mount=type=cache,target=/root/.m2 \
     ./mvnw -q -DskipTests dependency:go-offline
 
-COPY backend/src backend/src
+COPY backend/src ./src
 RUN --mount=type=cache,target=/root/.m2 \
     ./mvnw -q -DskipTests package
 
