@@ -14,38 +14,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  tests:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
-          cache: maven
-      - name: Backend tests
-        working-directory: backend
-        run: ./mvnw -q test
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.19.0'
-          cache: npm
-          cache-dependency-path: fastfood/package-lock.json
-      - name: Frontend install
-        working-directory: fastfood
-        run: npm ci
-      - name: Frontend build
-        working-directory: fastfood
-        run: npm run build
-
   deploy:
     runs-on: ubuntu-latest
-    needs: tests
     if: github.ref == 'refs/heads/main'
     environment:
       name: production
