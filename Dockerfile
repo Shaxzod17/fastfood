@@ -12,6 +12,8 @@ COPY backend/mvnw backend/mvnw
 COPY backend/mvnw.cmd backend/mvnw.cmd
 COPY backend/pom.xml backend/pom.xml
 WORKDIR /workspace/backend
+
+RUN chmod +x ./mvnw
 RUN --mount=type=cache,target=/root/.m2 \
     ./mvnw -q -DskipTests dependency:go-offline
 
