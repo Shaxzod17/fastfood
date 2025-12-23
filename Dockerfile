@@ -24,10 +24,10 @@ RUN --mount=type=cache,target=/root/.m2 \
 FROM eclipse-temurin:21-jre AS backend-runtime
 WORKDIR /app
 ENV JAVA_OPTS="" \
-    SERVER_PORT=80
+    SERVER_PORT=8080
 
 COPY --from=backend-build /workspace/backend/target/*.jar /app/app.jar
-EXPOSE 80
+EXPOSE 8080
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -Dserver.port=$SERVER_PORT -jar /app/app.jar"]
 
 ############################################
